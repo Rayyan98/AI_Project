@@ -1,18 +1,18 @@
 import hueristic
 
-def AlphaBeta(gan, state, depth):
-    return minimax(gan, state, depth, float('-inf'), float('inf'), True, depth)
+def AlphaBeta(state, depth):
+    return minimax(state, depth, float('-inf'), float('inf'), True, depth)
 
 
-def minimax(gan, state, depth, alpha, beta, maximizingPlayer, max_depth): #position is the starting point, depth is of tree, mP is a boolean
+def minimax(state, depth, alpha, beta, maximizingPlayer, max_depth): #position is the starting point, depth is of tree, mP is a boolean
 
-    if depth == 0 or gan.hasEnded(state) != 0:
+    if depth == 0 or state.hasEnded() != 0:
         a = hueristic.heuristic(state) * [-1, 1][maximizingPlayer] * 1000 - (max_depth - depth)
         return a
 
     if maximizingPlayer:
-        for i in gan.getActualPossMoves(state):
-            num = minimax(gan, gan.invert(gan.applyMoveChain(state, i)), depth-1, alpha, beta, False, max_depth)
+        for i in state.getActualPossMoves():
+            num = minimax(state.applyMoveChain(i).invert(), depth-1, alpha, beta, False, max_depth)
             if num > alpha:
                 alpha = num
                 if max_depth == depth:
@@ -24,8 +24,8 @@ def minimax(gan, state, depth, alpha, beta, maximizingPlayer, max_depth): #posit
         return alpha
 
     else:
-        for i in gan.getActualPossMoves(state):
-            num = minimax(gan, gan.invert(gan.applyMoveChain(state, i)), depth-1, alpha, beta, True, max_depth)
+        for i in state.getActualPossMoves():
+            num = minimax(state.applyMoveChain(i).invert(), depth-1, alpha, beta, True, max_depth)
             beta = min(beta,num)
             if beta <= alpha:
                 break

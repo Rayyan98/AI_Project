@@ -10,37 +10,64 @@ class checkersState:
 								 [-2,-2], [-2, 2], [2, 2], [2, -2]]).astype(int)
 		self.moveChains = []
 
+
+	def upperMovesOfPosition(self, pos):
+		i, j = pos
+		state = self.state
+		upper = []
+		if i - 2 >= 0 and j - 2 >= 0 and state[i - 2, j- 2] == 0 and state[i- 1, j - 1] < 0:
+			upper.append([pos.copy(), 5])
+		if i - 2 >= 0 and j + 2 <= 7 and state[i - 2, j + 2] == 0 and state[i - 1, j + 1] < 0:
+			upper.append([pos.copy(), 6])
+		if state[i, j] > 1:
+			if i + 2 <= 7 and j - 2 >= 0 and state[i + 2, j - 2] == 0 and state[i + 1, j - 1] < 0:
+				upper.append([pos.copy(), 8])
+			if i + 2 <= 7 and j + 2 <= 7 and state[i + 2, j + 2] == 0 and state[i + 1, j + 1] < 0:
+				upper.append([pos.copy(), 7])
+		return upper
+
+
+	def lowerMovesOfPosition(self, pos):
+		i, j = pos
+		state = self.state
+		lower = []
+		if i - 1 >= 0 and j - 1 >= 0 and state[i - 1, j - 1] == 0:
+			lower.append([pos.copy(), 1])
+		if i - 1 >= 0 and j + 1 <= 7 and state[i - 1, j + 1] == 0:
+			lower.append([pos.copy(), 2])
+		if state[i, j] > 1:
+			if i + 1 <= 7 and j - 1 >= 0 and state[i + 1, j - 1] == 0:
+				lower.append([pos.copy(), 4])
+			if i + 1 <= 7 and j + 1 <= 7 and state[i + 1, j + 1] == 0:
+				lower.append([pos.copy(), 3])
+		return lower
+
     
 	def getPossMoves(self):
 		state = self.state
 		lower, upper = [], []
+		yetUpper = False
 		pos = nd.zeros(shape = 2).astype(int)
 
 		for i in range(state.shape[0]):
 			for j in range(state.shape[1]):
-				pos[:] = [i,j]
+				pos[:] = i,j
 				if state[i, j] > 0:
-					if i - 1 >= 0 and j - 1 >= 0 and state[i - 1, j - 1] == 0:
-						lower.append([pos.copy(), 1])
-					elif i - 2 >= 0 and j - 2 >= 0 and state[i - 2, j- 2] == 0 and state[i- 1, j - 1] < 0:
-						upper.append([pos.copy(), 5])
-					if i - 1 >= 0 and j + 1 <= 7 and state[i - 1, j + 1] == 0:
-						lower.append([pos.copy(), 2])
-					elif i - 2 >= 0 and j + 2 <= 7 and state[i - 2, j + 2] == 0 and state[i - 1, j + 1] < 0:
-						upper.append([pos.copy(), 6])
-				if state[i, j] > 1:
-					if i + 1 <= 7 and j - 1 >= 0 and state[i + 1, j - 1] == 0:
-						lower.append([pos.copy(), 4])
-					elif i + 2 <= 7 and j - 2 >= 0 and state[i + 2, j - 2] == 0 and state[i + 1, j - 1] < 0:
-						upper.append([pos.copy(), 8])                    
-					if i + 1 <= 7 and j + 1 <= 7 and state[i + 1, j + 1] == 0:
-						lower.append([pos.copy(), 3])
-					elif i + 2 <= 7 and j + 2 <= 7 and state[i + 2, j + 2] == 0 and state[i + 1, j + 1] < 0:
-						upper.append([pos.copy(), 7])                    
-		
-		random.shuffle(lower)
-		random.shuffle(upper)
-		return lower, upper
+					if yetUpper:
+						upper.extend(self.upperMovesOfPosition(pos))
+					else:
+						u = self.upperMovesOfPosition(pos)
+						if not u:
+							lower.extend(self.lowerMovesOfPosition(pos))
+						else:
+							upper.extend(u)
+							yetUpper = True						
+		if yetUpper:
+			r = upper
+		else:
+			r = lower
+		random.shuffle(r)
+		return r, yetUpper
 
 
 	def applyMove(self, move):
@@ -82,30 +109,35 @@ class checkersState:
 	def getActualPossMoves(self):
 		if self.moveChains:
 			return self.moveChains
-		lower, upper = self.getPossMoves()
-		if not upper:
-			self.moveChains = [[i] for i in lower]
+		moves, yetUpper = self.getPossMoves()
+		if not yetUpper:
+			self.moveChains = [[i] for i in moves]
 			return self.moveChains
 		else:
-			result_states = [self.applyMove(i) for i in upper]
-			upper_moves = [[i] for i in upper]
+			moveChains = [[i] for i in moves]
+			lastStates = [checkersState(self.state) for i in moves]
 			ind = 0
-			while ind < len(result_states):
-				new_lower, new_upper = result_states[ind].getPossMoves()
-				if not new_upper:
+			while ind < len(lastStates):
+				cMoveChain = moveChains[ind]
+				cLastState = lastStates[ind]
+				lastMove = cMoveChain[-1]
+				pos, m_val = lastMove
+				m = self.moveMap[m_val - 1, :]
+				new_pos = m + pos
+				new_state = self.applyMove(lastMove)
+				new_moves = self.upperMovesOfPosition(new_pos)
+				if not new_moves:
 					ind += 1
 				else:
-					new_result_states = [result_states[ind].applyMove(i) for i in new_upper]
-					result_states[ind] = new_result_states.pop()
-					result_states.extend(new_result_states)
-					cache = new_upper.pop()
-					upper_moves.extend([upper_moves[ind] + [i] for i in new_upper])
-					upper_moves[ind].append(cache)
-			assert len(result_states) == len(upper_moves)
-			random.shuffle(upper_moves)
-			self.moveChains = upper_moves
+					one_new_move = new_moves.pop()
+					for i in new_moves:
+						moveChains.append(cMoveChain + [i])
+						lastStates.append(checkersState(new_state.state))
+					moveChains[ind].append(one_new_move)
+					lastStates[ind] = new_state
+			self.moveChains = moveChains
 			return self.moveChains
-
+			
 
 	def applyMoveChain(self, moveChain):
 		state = self
@@ -118,4 +150,14 @@ class checkersState:
 		return self.state.__str__()
 		
 		
-		
+	def __hash__(self):
+		return int("".join(map(str, (self.state + 3).reshape(-1).asnumpy().tolist())))
+
+
+	def __eq__(self, other):
+		return self.__hash__() == other.__hash__()
+
+
+
+
+

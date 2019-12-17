@@ -5,7 +5,7 @@ import random
 class checkersState:
 
 	def __init__(self, state):
-		self.state = nd.array(state).astype(int)
+		self.state = nd.array(state).reshape(8,8).astype(int)
 		self.moveMap = nd.array([[-1,-1], [-1, 1], [1, 1], [1, -1],
 								 [-2,-2], [-2, 2], [2, 2], [2, -2]]).astype(int)
 		self.moveChains = []

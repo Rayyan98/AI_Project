@@ -93,7 +93,7 @@ class checkersState:
 			return 1
 		if (state > 0).sum() == 0:
 			return -1
-		if len(self.getPossMoves()) == 0:
+		if len(self.getPossMoves()[0]) == 0:
 			return -1
 		return 0
 

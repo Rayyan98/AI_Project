@@ -52,6 +52,8 @@ class DataBuilder(checkers):
 					currentStates[self.currentState] = [0, 1]
 				else:
 					currentStates[self.currentState][1] += 1
+				if self.turn % 10 == 0:
+					print('checkPoint')
 			if self.currentState.hasEnded() == 1:
 				for j in currentStates:
 					currentStates[j][0] = currentStates[j][1]
@@ -62,13 +64,13 @@ class DataBuilder(checkers):
 					self.states[j][0] += currentStates[j][0]
 					self.states[j][1] += currentStates[j][1]
 			total_turns += self.turn
+			self.writeCsv()
 		print(total_turns)
 		print(len(self.states))
 				
 
 	def makeIterAndSave(self, n):
 		self.makeIter(n)
-		self.writeCsv()
 
 
 	def buildMoreData(self, n):

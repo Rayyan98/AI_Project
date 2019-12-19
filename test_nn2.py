@@ -16,3 +16,4 @@ n.Loss(0.8)
 n.backprop()
 
 print(n.weights2)
+print(n.weights1)

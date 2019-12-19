@@ -3,15 +3,7 @@ from checkers import checkers
 from computerPlayer import computerPlayer
 from humanPlayer import humanPlayer
 import numpy as np
-
-
-done = True
-
-def makeTheMove(checkers):
-	global done
-	checkers.singleMove()
-	done = True
-
+from io import StringIO
 
 pygame.init()
 
@@ -70,13 +62,9 @@ clearX2 = clearX2 * height / act_height
 clearY = clearY * height / act_height
 clearY2 = clearY2 * height / act_height
 
-
-c = checkers(humanPlayer(), computerPlayer(3))
-
 screen.blit(board, board_rect)
 pygame.display.flip()
 
-t = threading.Thread(target = makeTheMove, args = (c,))
 rect = pygame.Surface((int(dist),int(dist)))
 rect.set_alpha(128)
 rect.fill((255, 255, 255))
@@ -84,14 +72,33 @@ rect.fill((255, 255, 255))
 clicks = []
 selectState = np.zeros(shape = (int(dist),int(dist)))
 
+class pipe:
+	def __init__(self):
+		self.ready = False
+		self.move = ""
+
+pipE = pipe()
+
+done = True
+
+def makeTheMove(checkers):
+	global done
+	checkers.singleMove()
+	done = True
+
+c = checkers(computerPlayer(3), computerPlayer(3))
 
 while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT: sys.exit()
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			x,y = pygame.mouse.get_pos()
-			if x >= moveX and x <= moveX2 and y >= moveY and y <= moveY2:
-				sys.stdin.write(" ".join([",".join(i) for i in clicks]))
+			if x >= moveX and x <= moveX2 and y >= moveY and y <= moveY2 and clicks:
+				usersmove = " ".join([",".join(i) for i in clicks])
+				pipE.move = usersmove
+				pipE.ready = True
+				clicks = []
+				selectState[:, :] = 0
 			elif x >= clearX and x <= clearX2 and y >= clearY and y <= clearY2:
 				clicks = []
 				selectState[:, :] = 0

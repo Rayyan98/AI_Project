@@ -13,7 +13,9 @@ class NeuralNetwork:
 
 	def feedforward(self, x):
 		self.input = x
-		self.layer1 = self.sigmoid(np.dot(x, self.weights1) + self.bias1)
+		xW = np.dot(self.input, self.weights1)
+		Z = xW + self.bias1
+		self.layer1 = self.sigmoid(Z)
 		self.output = self.sigmoid(np.dot(self.layer1, self.weights2) + self.bias2)
 
 
@@ -30,6 +32,8 @@ class NeuralNetwork:
 	def Loss(self, y_actual):
 		self.y = y_actual.reshape(-1, 1)
 		self.loss = y_actual - self.output
+
+
 	def backprop(self):
 
 		error_output = (self.y - self.output) * self.sigmoid_derivative(self.output)
@@ -57,28 +61,19 @@ class NeuralNetwork:
 		
 	
 	def readfile(self):
-		self.weights1 = pd.read_csv('weights1.csv').to_numpy()
-		self.weights2 = pd.read_csv('weights2.csv').to_numpy()
-		self.bias1 = pd.read_csv('bias1.csv').to_numpy()
-		self.bias2 = pd.read_csv('bias2.csv').to_numpy()
+		self.weights1 = pd.read_csv('weights1.csv', header = 0).to_numpy()
+		self.weights2 = pd.read_csv('weights2.csv', header = 0).to_numpy()
+		self.bias1 = pd.read_csv('bias1.csv', header = 0).to_numpy()
+		self.bias2 = pd.read_csv('bias2.csv', header = 0).to_numpy()
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+	
+	def heuristic(self, state, maximizingPlayer, depth):
+		newstate = []
+		for i in state.state:
+			for j in i:
+				newstate.append(j)
+		newstate = np.array(newstate).reshape(1, -1)
+		self.feedforward(newstate)
+		return self.output
+
+

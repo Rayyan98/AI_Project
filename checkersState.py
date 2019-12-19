@@ -10,6 +10,23 @@ class checkersState:
 								 [-2,-2], [-2, 2], [2, 2], [2, -2]]).astype(int)
 		self.moveChains = []
 
+	
+	def seqPositions(self, moveChain):
+		lis= [moveChain[0][0]]
+		for move in moveChain:
+			pos, m_val = move
+			m = self.moveMap[m_val - 1, :]
+			target = m + pos
+			lis.append(target)
+		return lis
+	
+	
+	def allSeqPositions(self):
+		lis =[]
+		for i in self.getActualPossMoves():
+			lis.append(self.seqPositions(i))
+		return lis
+		
 
 	def upperMovesOfPosition(self, pos):
 		i, j = pos

@@ -11,7 +11,6 @@ data = df.iloc[:, :-2].to_numpy()
 
 ind = int(0.7 * len(data))
 
-labels = labels == 7
 trainX = data[:ind]
 testX = data[ind:]
 trainY = labels[:ind]
@@ -39,11 +38,11 @@ def accuracy(y, y_pred):
 	return a, p, r
 
 
-lr = 0.3
+lr = 0.003
 inp = 8 * 8
-hidden = 30
-epoch = 20
-batch_size = 16
+hidden = 10
+epoch = 10
+batch_size = 32
 
 n = nn(inp, hidden, lr)
 
@@ -57,8 +56,7 @@ for i in range(epoch):
 	print("train loss\t", error(trainY, n.output))
 	n.feedforward(testX)
 	print("test loss\t", error(testY, n.output))
-	print("measures: \t", accuracy(testY, n.output))
-
-	assert 1 == 0
+	print("measures: \t")
 
 
+#n.tofile()

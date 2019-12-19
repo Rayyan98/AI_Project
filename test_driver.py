@@ -1,5 +1,6 @@
 from checkers import checkers
 from computerPlayer import computerPlayer
+from humanPlayer import humanPlayer
 from builder import DataBuilder
 
 
@@ -96,9 +97,9 @@ startState = [  [ 0,  0,  0,  0,  0,  0,  0,  0],
 
 print("Starting ... ")
 
-#c = checkers(computerPlayer(1), computerPlayer(3), startState)
-#c.singleLoop()
+c = checkers(humanPlayer(), computerPlayer(3))
+c.singleLoop()
 
-g = DataBuilder()
-g.buildMoreData(500)
+# g = DataBuilder()
+# g.buildMoreData(500)
 

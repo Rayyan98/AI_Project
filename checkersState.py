@@ -12,12 +12,12 @@ class checkersState:
 
 	
 	def seqPositions(self, moveChain):
-		lis= [moveChain[0][0]]
+		lis= [moveChain[0][0].asnumpy().tolist()]
 		for move in moveChain:
 			pos, m_val = move
 			m = self.moveMap[m_val - 1, :]
 			target = m + pos
-			lis.append(target)
+			lis.append(target.asnumpy().tolist())
 		return lis
 	
 	

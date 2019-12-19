@@ -1,6 +1,8 @@
 import sys, pygame, threading
 from checkers import checkers
 from computerPlayer import computerPlayer
+from humanPlayer import humanPlayer
+import numpy as np
 
 
 done = True
@@ -50,16 +52,58 @@ start_pos = start_pos * height / act_height
 dist = 85
 dist = dist * height / act_height
 
-c = checkers(computerPlayer(3), computerPlayer(3))
+moveX = 844
+moveY = 65
+moveX2 = 965
+moveY2 = 105
+moveX = moveX * height / act_height
+moveX2 = moveX2 * height / act_height
+moveY = moveY * height / act_height
+moveY2 = moveY2 * height / act_height
+
+clearX = 845
+clearY = 136
+clearX2 = 960
+clearY2 = 176
+clearX = clearX * height / act_height
+clearX2 = clearX2 * height / act_height
+clearY = clearY * height / act_height
+clearY2 = clearY2 * height / act_height
+
+
+c = checkers(humanPlayer(), computerPlayer(3))
 
 screen.blit(board, board_rect)
 pygame.display.flip()
 
 t = threading.Thread(target = makeTheMove, args = (c,))
+rect = pygame.Surface((int(dist),int(dist)))
+rect.set_alpha(128)
+rect.fill((255, 255, 255))
+
+clicks = []
+selectState = np.zeros(shape = (int(dist),int(dist)))
+
 
 while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT: sys.exit()
+		elif event.type == pygame.MOUSEBUTTONDOWN:
+			x,y = pygame.mouse.get_pos()
+			if x >= moveX and x <= moveX2 and y >= moveY and y <= moveY2:
+				sys.stdin.write(" ".join([",".join(i) for i in clicks]))
+			elif x >= clearX and x <= clearX2 and y >= clearY and y <= clearY2:
+				clicks = []
+				selectState[:, :] = 0
+			else:
+				x = x - start_pos
+				y = y - start_pos
+				x = int(x // dist)
+				y = int(y // dist)
+				if x >= 0 and x <= 7 and y >= 0 and y <= 7:
+					clicks.append([str(y),str(x)])
+					selectState[y, x] = 1
+
 
 	screen.blit(board, board_rect)
 
@@ -80,7 +124,10 @@ while True:
 				temp_rect = black_rect.copy()
 				temp_rect.x = dist * j + start_pos
 				temp_rect.y = dist * i + start_pos
-				screen.blit(black, temp_rect)				
+				screen.blit(black, temp_rect)
+			if selectState[i, j] == 1:
+				screen.blit(rect, (int(dist * j + start_pos), int(dist * i + start_pos)))
+				
 			
 	pygame.display.flip()
 

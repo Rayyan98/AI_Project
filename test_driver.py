@@ -100,6 +100,6 @@ print("Starting ... ")
 c = checkers(computerPlayer(3), computerPlayer(3), startState)
 c.singleLoop()
 
-# g = DataBuilder()
+# g = DataBuilder(startState)
 # g.buildMoreData(500)
 

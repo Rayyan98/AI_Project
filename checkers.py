@@ -32,8 +32,10 @@ class checkers:
 	def singleMove(self):
 		if self.currentState.hasEnded() == 0:
 			if self.turn % 2 == 1:
+				print("Waiting for player 1")
 				self.currentState = self.p1.makeMove(self.currentState)
 			else:
+				print("Waiting for player 2")
 				self.currentState = self.p2.makeMove(self.currentState.invert()).invert()
 			self.turn += 1
 			return True
@@ -45,6 +47,11 @@ class checkers:
 
 		while self.singleMove():
 			print(self.currentState)
+			
+		if self.currentState.hasEnded() == 1:
+			print("Victory for Player 1")
+		else:
+			print("Victory for Player 2")
 
 		print(self.turn)
 

@@ -75,6 +75,7 @@ selectState = np.zeros(shape = (int(dist),int(dist)))
 class pipe:
 	def __init__(self):
 		self.ready = False
+		self.quit = False
 		self.move = ""
 
 pipE = pipe()
@@ -86,11 +87,15 @@ def makeTheMove(checkers):
 	checkers.singleMove()
 	done = True
 
-c = checkers(computerPlayer(3), computerPlayer(3))
+c = checkers(humanPlayer(pipE), computerPlayer(3))
+# c = checkers(computerPlayer(3), computerPlayer(3))
 
-while True:
+
+while True and c.currentState.hasEnded() == 0:
 	for event in pygame.event.get():
-		if event.type == pygame.QUIT: sys.exit()
+		if event.type == pygame.QUIT: 
+			pipE.quit = True
+			sys.exit()
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			x,y = pygame.mouse.get_pos()
 			if x >= moveX and x <= moveX2 and y >= moveY and y <= moveY2 and clicks:
@@ -127,14 +132,24 @@ while True:
 				temp_rect.x = dist * j + start_pos
 				temp_rect.y = dist * i + start_pos
 				screen.blit(white, temp_rect)
+				if state[i][j] == 3:
+					pos = [int(temp_rect.x + temp_rect.w / 2), int(temp_rect.y + temp_rect.h / 2)]
+					pygame.draw.circle(screen, (0,0,255), pos, int(dist // 3), 2)
 			elif state[i][j] < 0:
 				temp_rect = black_rect.copy()
 				temp_rect.x = dist * j + start_pos
 				temp_rect.y = dist * i + start_pos
 				screen.blit(black, temp_rect)
+				if state[i][j] == -3:
+					pos = [int(temp_rect.x + temp_rect.w / 2), int(temp_rect.y + temp_rect.h / 2)]
+					pygame.draw.circle(screen, (0,0,255), pos, int(dist // 3), 2)
 			if selectState[i, j] == 1:
 				screen.blit(rect, (int(dist * j + start_pos), int(dist * i + start_pos)))
 				
 			
 	pygame.display.flip()
 
+if c.currentState.hasEnded() == 1:
+	print("Victory for Player 1")
+else:
+	print("Victory for Player 2")

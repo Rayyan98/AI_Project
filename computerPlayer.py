@@ -1,6 +1,7 @@
 from alphabeta import AlphaBeta
 from hueristic import heuristic
 from NN import NeuralNetwork
+import random
 
 
 class computerPlayer:
@@ -15,6 +16,12 @@ class computerPlayer:
 		
 		
 	def makeMove(self, state):
+
+		# moves = state.getActualPossMoves()
+		# move = moves[int(random.random() * len(moves))]
+
 		move = AlphaBeta(state, self.depth, self.heuristic)
+
 		return state.applyMoveChain(move)
+
 
